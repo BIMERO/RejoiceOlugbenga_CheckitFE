@@ -41,4 +41,5 @@ TypeScript: Ensures type safety across components.
 Redux/redux-toolkit: For state management.
 Moment.js: Handles date formatting and parsing for capsule data.
 
-
+Video Walk-Through
+[project-walkthrough.zip](https://github.com/user-attachments/files/17549335/project-walkthrough.zip)
