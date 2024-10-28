@@ -6,7 +6,7 @@ import { Column } from "primereact/column";
 import moment from "moment";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { Button } from "primereact/button";
-import { Field, Form, Formik } from "formik";
+import { Formik } from "formik";
 import AddCapsuleModal from "./AddCapsuleModal";
 import { Capsule } from "@/types/capsule";
 import EditCapsule from "./EditCapsule";
@@ -16,16 +16,20 @@ import {
   addNewCapsule,
   editExistingCapsule,
 } from "@/redux/slices/CapsuleSlicer";
+import DetailsModal from "./DetailsModal";
 
 const Capsules = () => {
   const dispatch = useDispatch();
 
-  const capsuleData = useSelector((state: any) => state.capsule.data);
+  const capsuleData = useSelector(
+    (state: { capsule: { data: Capsule[] } }) => state.capsule.data
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [filteredCapsules, setFilteredCapsules] = useState<Capsule[]>([]);
   const [addCapsule, setAddCapsule] = useState(false);
   const [editCapsule, setEditCapsule] = useState<Capsule | null>(null);
+  const [selectedCapsule, setSelectedCapsule] = useState<Capsule | null>(null);
 
   useEffect(() => {
     const fetchCapsules = async () => {
@@ -57,7 +61,7 @@ const Capsules = () => {
       field: "original_launch",
       header: "Original Launch",
 
-      body: (rowData: any) =>
+      body: (rowData: Capsule) =>
         moment(rowData.original_launch).format("MMMM Do, YYYY"),
     },
     { field: "landings", header: "Landings" },
@@ -66,14 +70,14 @@ const Capsules = () => {
     { field: "reuse_count", header: "Reuse Count" },
     {
       header: "Missions",
-      // body: (rowData: any) =>
-      //   rowData.missions.map((mission: any) => mission.name).join(", "),
+      body: (rowData: Capsule) =>
+        rowData.missions?.map((mission) => mission.name).join(", "),
     },
     {
       header: "Edit",
       body: (rowData: Capsule) => (
         <button onClick={() => openEditModal(rowData)}>
-          <BiSolidEditAlt />
+          <BiSolidEditAlt className="text-2xl" />
         </button>
       ),
     },
@@ -82,8 +86,8 @@ const Capsules = () => {
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
 
-  const handleSearch = (value: any) => {
-    const filtered = capsulesData.filter((capsule: any) => {
+  const handleSearch = (value: Partial<Capsule>) => {
+    const filtered = capsuleData.filter((capsule: Capsule) => {
       return (
         (!value.status || capsule.status.includes(value.status)) &&
         (!value.type || capsule.type.includes(value.type)) &&
@@ -101,17 +105,23 @@ const Capsules = () => {
     setAddCapsule(true);
   };
 
+  const CloseAddModal = () => {
+    setAddCapsule(false);
+  };
+
   const handleAdd = (newCapsule: Capsule) => {
     dispatch(addNewCapsule(newCapsule));
     console.log("Adding new capsule:", newCapsule);
+    setFilteredCapsules([...capsuleData, newCapsule]);
     setAddCapsule(false);
   };
 
   const openEditModal = (capsule: Capsule) => {
     const formattedCapsule = {
       ...capsule,
-      original_launch: moment(capsule.original_launch).format("YYYY-MM-DD"), // Format the date
+      original_launch: moment(capsule.original_launch).format("YYYY-MM-DD"),
     };
+    setSelectedCapsule(null);
     setEditCapsule(formattedCapsule);
   };
 
@@ -120,59 +130,92 @@ const Capsules = () => {
 
     dispatch(editExistingCapsule(updatedCapsule));
 
-    // setFilteredCapsules((prev) =>
-    //   prev.map((rowdata) =>
-    //     rowdata.capsule_serial === updatedCapsule.capsule_serial
-    //       ? updatedCapsule
-    //       : rowdata
-    //   )
-    // );
+    setFilteredCapsules((prev) =>
+      prev.map((rowdata) =>
+        rowdata.capsule_serial === updatedCapsule.capsule_serial
+          ? updatedCapsule
+          : rowdata
+      )
+    );
 
     setEditCapsule(null);
   };
 
-  return (
-    <>
-      <section className="contain">
-        <h2>Capsules</h2>
+  const showDetails = (capsule: Capsule) => {
+    setSelectedCapsule(capsule);
+  };
 
-        <div>
-          <button onClick={OpenModal}>Add New Capsule</button>
+  return (
+    <div className="relative">
+      <section className="contain py-24">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-10">
+          <h2 className="text-3xl font-bold mb-4">Capsules</h2>
+          <button
+            onClick={OpenModal}
+            className="bg-brand_primary-50 text-white py-3 px-8 rounded-xl"
+          >
+            Add New Capsule
+          </button>
         </div>
 
-        <Formik initialValues={{ status: "", original_launch: "", type: "" }}>
+        <Formik
+          initialValues={{ status: "", original_launch: "", type: "" }}
+          onSubmit={() => {}}
+        >
           {({ values, handleChange }) => (
-            <Form>
-              <Field
-                name="status"
-                placeholder="Status"
-                onChange={(e) => {
-                  handleChange(e);
-                  handleSearch({ ...values, status: e.target.value });
-                }}
-              />
-              <Field
-                name="original_launch"
-                placeholder="Original Launch"
-                onChange={(e) => {
-                  handleChange(e);
-                  handleSearch({ ...values, original_launch: e.target.value });
-                }}
-              />
-              <Field
-                name="type"
-                placeholder="Type"
-                onChange={(e) => {
-                  handleChange(e);
-                  handleSearch({ ...values, type: e.target.value });
-                }}
-              />
-            </Form>
+            <form className="flex flex-wrap items-center justify-between mb-8 gap-4">
+              <div className="flex flex-col flex-1">
+                <label htmlFor="" className="text-sm font-bold mb-2">
+                  Status:
+                </label>
+                <input
+                  name="status"
+                  placeholder="Status"
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleSearch({ ...values, status: e.target.value });
+                  }}
+                  className="border border-brand_primary-50 outline-none p-3 flex-1 rounded-md"
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <label htmlFor="" className="text-sm font-bold mb-2">
+                  Original Launch Date:
+                </label>
+                <input
+                  name="original_launch"
+                  type="date"
+                  placeholder="Original Launch"
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleSearch({
+                      ...values,
+                      original_launch: e.target.value,
+                    });
+                  }}
+                  className="border border-brand_primary-50 outline-none p-3 flex-1 rounded-md"
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <label htmlFor="" className="text-sm font-bold mb-2">
+                  Type:
+                </label>
+                <input
+                  name="type"
+                  placeholder="Type"
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleSearch({ ...values, type: e.target.value });
+                  }}
+                  className="border border-brand_primary-50 outline-none p-3 flex-1 rounded-md"
+                />
+              </div>
+            </form>
           )}
         </Formik>
 
         <DataTable
-          value={capsuleData}
+          value={filteredCapsules}
           loading={loading}
           stripedRows
           paginator
@@ -182,6 +225,7 @@ const Capsules = () => {
           emptyMessage={error ? "Error loading data" : "No data found"}
           paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
           showGridlines
+          onRowClick={(e) => showDetails(e.data as Capsule)}
         >
           {columns.map((col, i) => (
             <Column
@@ -189,12 +233,15 @@ const Capsules = () => {
               field={col.field}
               header={col.header}
               body={col.body}
+              style={{ textAlign: "center", padding: "1.25rem" }}
             />
           ))}
         </DataTable>
       </section>
 
-      {addCapsule && <AddCapsuleModal onAdd={handleAdd} />}
+      {addCapsule && (
+        <AddCapsuleModal onAdd={handleAdd} onClose={CloseAddModal} />
+      )}
 
       {editCapsule && (
         <EditCapsule
@@ -203,7 +250,14 @@ const Capsules = () => {
           onClose={() => setEditCapsule(null)}
         />
       )}
-    </>
+
+      {selectedCapsule && (
+        <DetailsModal
+          selectedCapsule={selectedCapsule}
+          onClose={() => setSelectedCapsule(null)}
+        />
+      )}
+    </div>
   );
 };
 

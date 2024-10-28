@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
 @import "primereact/resources/themes/lara-light-blue/theme.css";
 
 @tailwind base;
@@ -10,9 +12,20 @@
   box-sizing: border-box;
 }
 
+body{
+  font-family: "Oswald", sans-serif;
+  font-size: 16px;
+}
+
 .contain {
   max-width: 90%;
   margin: 0 auto;
+}
+
+@media screen and (max-width: 768px) {
+  .logo {
+    width: 60%;
+  }
 }
 
 @media screen and (min-width: 1400px) {

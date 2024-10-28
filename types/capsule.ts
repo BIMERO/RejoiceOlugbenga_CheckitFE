@@ -8,7 +8,7 @@ export interface Capsule {
   capsule_id: string;
   status: string;
   original_launch: string;
-  missions?: Missions[];
+  missions: Missions[];
   landings: number;
   type: string;
   details: string;

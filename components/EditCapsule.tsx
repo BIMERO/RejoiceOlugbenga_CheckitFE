@@ -1,7 +1,8 @@
 import React from "react";
 import { Capsule } from "@/types/capsule";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
+import { FaXmark } from "react-icons/fa6";
 
 const EditCapsule = ({
   onEdit,
@@ -27,118 +28,245 @@ const EditCapsule = ({
     reuse_count: Yup.number()
       .min(0, "Reuse count must be a non-negative number")
       .required("Reuse count is required"),
-    // missions: Yup.string(), // Optional field
+    missions: Yup.array().of(
+      Yup.object().shape({
+        name: Yup.string().required("Mission name is required"),
+        flight: Yup.number().required("Flight number is required").min(1),
+      })
+    ),
   });
 
   const initialValues: Capsule = {
-    capsule_serial: capsulesData.capsule_serial,
-    capsule_id: capsulesData.capsule_id,
-    status: capsulesData.status,
-    original_launch: capsulesData.original_launch,
-    type: capsulesData.type,
-    details: capsulesData.details || "",
-    landings: capsulesData.landings || 0,
-    reuse_count: capsulesData.reuse_count || 0,
-    //  missions: capsulesData.missions.map((mission) => mission.name).join(", "), // Convert missions array to comma-separated string
+    ...capsulesData,
   };
 
   const handleSubmit = (values: Capsule) => {
-    // const missionsArray = values.missions
-    //   ? values.missions
-    //       .split(",")
-    //       .map((mission: string) => ({ name: mission.trim() }))
-    //   : [];
-
-    const updatedCapsule: Capsule = {
-      ...values,
-      //   missions: missionsArray,
-    };
-
-    console.log("Submitting updated capsule:", updatedCapsule); // Log the updated capsule data
-    onEdit(updatedCapsule);
+    console.log("Submitting updated capsule:", values);
+    onEdit(values);
     onClose();
   };
 
   return (
-    <section>
-      <h2>Edit Capsule</h2>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <div>
-              <Field name="capsule_serial" placeholder="Capsule Serial" />
-              <ErrorMessage
-                name="capsule_serial"
-                component="div"
-                className="error"
-              />
-            </div>
-            <div>
-              <Field name="capsule_id" placeholder="Capsule ID" />
-              <ErrorMessage
-                name="capsule_id"
-                component="div"
-                className="error"
-              />
-            </div>
-            <div>
-              <Field name="status" placeholder="Status" />
-              <ErrorMessage name="status" component="div" className="error" />
-            </div>
-            <div>
-              <Field
-                name="original_launch"
-                type="date"
-                placeholder="Original Launch"
-              />
-              <ErrorMessage
-                name="original_launch"
-                component="div"
-                className="error"
-              />
-            </div>
-            <div>
-              <Field name="type" placeholder="Type" />
-              <ErrorMessage name="type" component="div" className="error" />
-            </div>
-            <div>
-              <Field name="details" placeholder="Details" />
-              <ErrorMessage name="details" component="div" className="error" />
-            </div>
-            <div>
-              <Field name="landings" type="number" placeholder="Landings" />
-              <ErrorMessage name="landings" component="div" className="error" />
-            </div>
-            <div>
-              <Field
-                name="reuse_count"
-                type="number"
-                placeholder="Reuse Count"
-              />
-              <ErrorMessage
-                name="reuse_count"
-                component="div"
-                className="error"
-              />
-            </div>
-            <div>
-              <Field name="missions" placeholder="Missions (comma-separated)" />
-              <ErrorMessage name="missions" component="div" className="error" />
-            </div>
+    <section className="bg-black/20 w-screen h-full absolute top-0 left-0 flex items-center justify-center">
+      <div className="contain">
+        <div className="flex flex-col items-center justify-center h-full bg-white rounded-xl my-10 mx-auto w-full max-w-3xl p-10">
+          <div className="flex flex-wrap items-center justify-between gap-4 w-full border-b border-brand_primary-50 py-3 mb-5">
+            <h3 className="text-2xl font-medium">Edit Capsule</h3>
+            <FaXmark className="text-2xl cursor-pointer" onClick={onClose} />
+          </div>
 
-            <button type="submit" disabled={isSubmitting}>
-              Update Capsule
-            </button>
-            <button type="button" onClick={onClose}>
-              Cancel
-            </button>
-          </Form>
-        )}
-      </Formik>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ values }) => (
+              <Form className="w-full">
+                <div className="flex flex-wrap gap-4 mb-3">
+                  <div className="flex flex-col flex-1">
+                    <label htmlFor="" className="text-sm font-bold mb-2">
+                      Capsule Serial
+                    </label>
+                    <Field
+                      name="capsule_serial"
+                      placeholder="Capsule Serial"
+                      className="border outline-none border-brand_primary-50 rounded-md p-3"
+                    />
+                    <ErrorMessage
+                      name="capsule_serial"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <label htmlFor="" className="text-sm font-bold mb-2">
+                      Capsule ID
+                    </label>
+                    <Field
+                      name="capsule_id"
+                      placeholder="Capsule ID"
+                      className="border outline-none border-brand_primary-50 rounded-md p-3"
+                    />
+                    <ErrorMessage
+                      name="capsule_id"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4 mb-3">
+                  <div className="flex flex-col flex-1">
+                    <label htmlFor="" className="text-sm font-bold mb-2">
+                      Status
+                    </label>
+                    <Field
+                      name="status"
+                      placeholder="Status"
+                      className="border outline-none border-brand_primary-50 rounded-md p-3"
+                    />
+                    <ErrorMessage
+                      name="status"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <label htmlFor="" className="text-sm font-bold mb-2">
+                      Original Launch
+                    </label>
+                    <Field
+                      name="original_launch"
+                      placeholder="Original Launch"
+                      type="date"
+                      className="border outline-none border-brand_primary-50 rounded-md p-3"
+                    />
+                    <ErrorMessage
+                      name="original_launch"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4 mb-3">
+                  <div className="flex flex-col flex-1">
+                    <label htmlFor="" className="text-sm font-bold mb-2">
+                      Type
+                    </label>
+                    <Field
+                      name="type"
+                      placeholder="Type"
+                      className="border outline-none border-brand_primary-50 rounded-md p-3"
+                    />
+                    <ErrorMessage
+                      name="type"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <label htmlFor="" className="text-sm font-bold mb-2">
+                      Details
+                    </label>
+                    <Field
+                      name="details"
+                      placeholder="Details"
+                      className="border outline-none border-brand_primary-50 rounded-md p-3"
+                    />
+                    <ErrorMessage
+                      name="details"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4 mb-3">
+                  <div className="flex flex-col flex-1">
+                    <label htmlFor="" className="text-sm font-bold mb-2">
+                      Landings
+                    </label>
+                    <Field
+                      name="landings"
+                      type="number"
+                      placeholder="Landings"
+                      className="border outline-none border-brand_primary-50 rounded-md p-3"
+                    />
+                    <ErrorMessage
+                      name="landings"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <label htmlFor="" className="text-sm font-bold mb-2">
+                      Reuse Count
+                    </label>
+                    <Field
+                      name="reuse_count"
+                      type="number"
+                      placeholder="Reuse Count"
+                      className="border outline-none border-brand_primary-50 rounded-md p-3"
+                    />
+                    <ErrorMessage
+                      name="reuse_count"
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-5">
+                  <label htmlFor="missions" className="text-sm font-bold mb-4">
+                    Missions
+                  </label>
+                  <FieldArray name="missions">
+                    {({ remove, push }) => (
+                      <>
+                        {values.missions?.map((mission, index) => (
+                          <div key={index} className="flex gap-4 mb-3">
+                            <div className="flex-1">
+                              <label className="text-sm font-bold">Name</label>
+                              <Field
+                                name={`missions[${index}].name`}
+                                placeholder="Mission Name"
+                                className="border p-2 rounded w-full"
+                              />
+                              <ErrorMessage
+                                name={`missions[${index}].name`}
+                                component="div"
+                                className="text-red-500 text-sm"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <label className="text-sm font-bold">
+                                Flight
+                              </label>
+                              <Field
+                                name={`missions[${index}].flight`}
+                                placeholder="Flight Number"
+                                type="number"
+                                className="border p-2 rounded w-full"
+                              />
+                              <ErrorMessage
+                                name={`missions[${index}].flight`}
+                                component="div"
+                                className="text-red-500 text-sm"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              className="text-red-500 font-bold"
+                              onClick={() => remove(index)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => push({ name: "", flight: 0 })}
+                          className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                          Add Mission
+                        </button>
+                      </>
+                    )}
+                  </FieldArray>
+                </div>
+
+                <button
+                  type="submit"
+                  className="bg-brand_primary-50 text-white py-3 px-8 rounded-xl"
+                >
+                  Update Capsule
+                </button>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </div>
     </section>
   );
 };

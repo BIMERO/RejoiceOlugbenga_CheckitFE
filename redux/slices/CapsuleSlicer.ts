@@ -21,7 +21,6 @@ const capsuleSlice = createSlice({
 
     addNewCapsule(state, action: PayloadAction<Capsule>) {
       state.data.push(action.payload);
-      console.log("Redux State after adding:", state.data);
     },
 
     editExistingCapsule(state, action: PayloadAction<Capsule>) {
