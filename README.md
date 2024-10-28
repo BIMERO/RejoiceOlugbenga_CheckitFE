@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+SpaceX Capsules Dashboard
 
-## Getting Started
+This project is a SpaceX Landing page, providing a streamlined way to view, search, and edit information about SpaceX capsules.
 
-First, run the development server:
+The landing page is built using Next.js and PrimeReact for a responsive, user-friendly interface.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Users can browse capsule data, search/filter by key capsule attributes, create new capsules, and manage capsule entries directly on the landing page.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Features:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Capsule List
+   Displays a paginated table with all SpaceX capsules, allowing users to easily navigate and review capsule details. The table provides:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Pagination: View capsules 5 entries per page.
+Dynamic Data: Capsule data updates automatically when new entries are added or existing ones are edited.
 
-## Learn More
+2. Search and Filter Capsules
+   Users can filter capsule data based on specific attributes:
+   Status: Search capsules by their status.
+   Original Launch Date: Search capsules by launch date.
+   Type: Filter capsules by type (e.g., "Dragon 1.0").
+   Formik Integration: A Formik-powered search form manages inputs and updates the displayed list without a page reload.
 
-To learn more about Next.js, take a look at the following resources:
+3. Add New Capsules
+   Form Submission: Users can add new capsule entries by filling out a form. New entries are added to the app’s state and appear immediately in the capsule list.
+   Local State Management: Newly added capsules are stored locally.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Edit Existing Capsules
+   Edit Modal: Each capsule entry has an edit option that opens a modal with prefilled form fields.
+   Data Validation: Form fields are validated using Yup to ensure data integrity (e.g., required fields, correct date formats).
+   Dynamic Updates: The capsule list updates automatically when edited entries are saved.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Responsive Design
+   The app is fully responsive, optimized for both desktop and mobile devices.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Tech Stack
+Next.js: For building Landing Page and server-side rendering.
+PrimeReact: For building table.
+Formik & Yup: For managing form state and validation.
+TypeScript: Ensures type safety across components.
+Redux/redux-toolkit: For state management.
+Moment.js: Handles date formatting and parsing for capsule data.
