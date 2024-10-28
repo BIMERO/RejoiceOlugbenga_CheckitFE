@@ -8,8 +8,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        herobg: "url('/hrobg.png')",
+      },
       colors: {
-        background: "var(--background)",
+        brand_primary: {
+          50: "#040404",
+        },
         foreground: "var(--foreground)",
       },
     },
