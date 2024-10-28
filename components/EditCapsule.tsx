@@ -48,7 +48,7 @@ const EditCapsule = ({
 
   return (
     <section className="bg-black/20 w-screen h-full absolute top-0 left-0 flex items-center justify-center">
-      <div className="contain">
+      <div className="contain w-full">
         <div className="flex flex-col items-center justify-center h-full bg-white rounded-xl my-10 mx-auto w-full max-w-3xl p-10">
           <div className="flex flex-wrap items-center justify-between gap-4 w-full border-b border-brand_primary-50 py-3 mb-5">
             <h3 className="text-2xl font-medium">Edit Capsule</h3>

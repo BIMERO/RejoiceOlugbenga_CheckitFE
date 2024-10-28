@@ -126,6 +126,7 @@ const Capsules = () => {
   };
 
   const handleEdit = (updatedCapsule: Capsule) => {
+    setSelectedCapsule(null);
     console.log("Updating capsule:", updatedCapsule);
 
     dispatch(editExistingCapsule(updatedCapsule));
